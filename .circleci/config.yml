@@ -50,7 +50,7 @@ jobs:
           name: Push application Docker image
           command: |
             if [ "${CIRCLE_BRANCH}" == "main" ]; then
-              login="$(aws ecr get-login --region "us-west-1")"
+              login="$(aws ecr get-login --region ${AWS_REGION})"
               ${login}
               docker tag app "${AWS_ECR_ACCOUNT_URL}/nodejs-app:${CIRCLE_BUILD_NUM}"
               docker push "${AWS_ECR_ACCOUNT_URL}/nodejs-app:${CIRCLE_BUILD_NUM}"
