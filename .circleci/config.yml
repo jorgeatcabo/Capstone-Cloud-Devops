@@ -6,7 +6,7 @@ jobs:
 workflows:
   default:
     jobs:
-    # Envs: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, AWS_ECR_ACCOUNT_URL
+    #Envs: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, AWS_ECR_ACCOUNT_URL
     - aws-ecr/build-and-push-image:
         repo: nodejs-app
         tag: "latest,v0.1.${CIRCLE_BUILD_NUM}"
