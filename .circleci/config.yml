@@ -49,7 +49,7 @@ jobs:
       - deploy:
           name: Push application Docker image
           command: |
-            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+            if [ "${CIRCLE_BRANCH}" == "main" ]; then
               login="$(aws ecr get-login)"
               ${login}
               docker tag app "${AWS_ECR_ACCOUNT_URL}/app:${CIRCLE_SHA1}"
