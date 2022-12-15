@@ -143,8 +143,7 @@ workflows:
       - build_image_and_deploy_staging
           filters:
             branches:
-              only: master
-
+              only: main
 
 
 #      - aws-ecr/build-and-push-image:
