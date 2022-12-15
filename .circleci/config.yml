@@ -56,11 +56,94 @@ jobs:
               docker push "${AWS_ECR_ACCOUNT_URL}/nodejs-app:${CIRCLE_BUILD_NUM}"
             fi
 
+  build_image_and_deploy_staging:
+    docker:
+      - image: circleci/python:3.7
+
+    working_directory: ~/app
+
+    steps:
+      - attach_workspace:
+          at: ~/app
+
+      - run:
+          name: Install awscli and gettext-base
+          command: |
+            sudo pip3 install awscli
+      - run:
+          name: Install aws-iam-authenticator
+          command: |
+            curl -o aws-iam-authenticator curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator
+            chmod +x ./aws-iam-authenticator
+            sudo mv ./aws-iam-authenticator /usr/local/bin/aws-iam-authenticator
+      - run:
+          name: Install kubectl
+          command: |
+            curl -o kubectl https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/kubectl
+            chmod +x ./kubectl
+            sudo mv ./kubectl /usr/local/bin/kubectl
+
+      - setup_remote_docker
+
+      - run:
+          name: Login to repository and build docker image
+          command: |
+            eval $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
+            docker build -t ${AWS_ECR_ACCOUNT_URL}/nodejs-app:${CIRCLE_BUILD_NUM} .
+            docker push ${AWS_ECR_ACCOUNT_URL}/nodejs-app:${CIRCLE_BUILD_NUM}
+      - run:
+          name: Prepare K8S templates
+          command: |
+            aws eks --region $AWS_DEFAULT_REGION update-kubeconfig --name $CLUSTER_NAME
+            rm -rf .k8s/.generated && mkdir -p .k8s/.generated
+            for f in .k8s/templates/staging.yml
+              do
+              envsubst < $f > ".k8s/.generated/$(basename $f)"
+            done
+      - run:
+          name: Deploy
+          command: |
+            kubectl apply -f .k8s/.generated/ --validate=true
+            kubectl get pod            
+  
+#  deploy-app:
+#    docker:
+#      - image: circleci/node:13.8.0
+#    steps:
+#      - checkout
+#      - run:
+#          name: Install dependencies
+#          command: |
+#            sudo apt install -y tar gzip curl unzip
+#      - run:
+#          name: Install kubectl
+#          command: |
+#            curl -LO https://dl.k8s.io/release/v1.25.0/bin/linux/amd64/kubectl
+#            sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+#      - run:
+#          name: Install aws-cli
+#          command: |
+#            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+#            unzip awscliv2.zip
+#            sudo ./aws/install
+#      - run:
+#          name: Deploy app
+#          command: |
+#            DOCKER_PATH="thanhlam00290/udacity-project5"
+#            sed "s+thanhlam00290/udacity-project5:0.1+$DOCKER_PATH:${CIRCLE_WORKFLOW_ID:0:7}+g" app-deployment.yml >> deploy.yml
+#            aws eks --region us-east-1 update-kubeconfig --name eksctl-demo
+#            kubectl apply -f ./deploy.yml
+#            kubectl get node
+#            kubectl get pods -o wide            
+
+
 workflows:
   build_and_push_image:
     jobs:
-      - build
-
+      - build_image_and_deploy_staging
+          filters:
+            branches:
+              only: master
 
 
 
