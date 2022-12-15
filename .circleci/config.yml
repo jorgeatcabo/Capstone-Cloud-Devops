@@ -140,7 +140,7 @@ jobs:
 workflows:
   build_and_push_image:
     jobs:
-      - build_image_and_deploy_staging
+      - build_image_and_deploy_staging:
           filters:
             branches:
               only: main
