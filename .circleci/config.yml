@@ -88,7 +88,7 @@ jobs:
       - run:
           name: Login to repository and build docker image
           command: |
-            eval $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
+            eval $(aws ecr get-login --region $AWS_REGION --no-include-email)
             docker build -t ${AWS_ECR_ACCOUNT_URL}/nodejs-app:${CIRCLE_BUILD_NUM} .
             docker push ${AWS_ECR_ACCOUNT_URL}/nodejs-app:${CIRCLE_BUILD_NUM}
       - run:
