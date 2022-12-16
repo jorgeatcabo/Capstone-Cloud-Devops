@@ -14,7 +14,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk --upgrade add --no-cache curl\
+            apk --upgrade add --no-cache curl awscli\
               py-pip=9.0.0-r1
             pip install \
               docker-compose==1.12.0 \
@@ -45,13 +45,7 @@ jobs:
       #    name: Run tests
       #    command: |
       #      docker-compose -f ./docker-compose.test.yml up
-      - run:
-          name: Install aws-cli
-          command: |
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            ./aws/install      
-      - run:
+      - deploy:
           name: Push application Docker image
           command: |
             if [ "${CIRCLE_BRANCH}" == "main" ]; then
