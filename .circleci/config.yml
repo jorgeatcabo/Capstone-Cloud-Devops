@@ -19,7 +19,7 @@ jobs:
             pip install \
               docker-compose==1.12.0 \
               awscli==1.11.76 \
-              curl
+              curl=7.64.0-r5
       - restore_cache:
           keys:
             - v1-{{ .Branch }}
