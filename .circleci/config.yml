@@ -55,6 +55,26 @@ jobs:
               docker tag app "${AWS_ECR_ACCOUNT_URL}/nodejs-app:${CIRCLE_BUILD_NUM}"
               docker push "${AWS_ECR_ACCOUNT_URL}/nodejs-app:${CIRCLE_BUILD_NUM}"
             fi
+      - run:
+          name: Install kubectl
+          command: |
+            curl -o kubectl https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/kubectl
+            chmod +x ./kubectl
+            sudo mv ./kubectl /usr/local/bin/kubectl
+      - run:
+          name: Prepare K8S templates
+          command: |
+            aws eks --region $AWS_REGION update-kubeconfig --name nodejs-app-cluster
+            rm -rf .k8s/.generated && mkdir -p .k8s/.generated
+            for f in .k8s/templates/staging.yml
+              do
+              envsubst < $f > ".k8s/.generated/$(basename $f)"
+            done
+      - run:
+          name: Deploy
+          command: |
+            kubectl apply -f .k8s/.generated/ --validate=true
+            kubectl get pod                
 
   build_image_and_deploy_staging:
     docker:
@@ -106,6 +126,38 @@ jobs:
           command: |
             kubectl apply -f .k8s/.generated/ --validate=true
             kubectl get pod            
+     
+
+
+workflows:
+  build_and_push_image:
+    jobs:
+       - build:
+          filters:
+            branches:
+              only: main 
+              
+#      - build_image_and_deploy_staging:
+#          filters:
+#            branches:
+#              only: main
+
+
+#      - aws-ecr/build-and-push-image:
+#          account-url: AWS_ECR_ACCOUNT_URL
+#          aws-access-key-id: AWS_ACCESS_KEY_ID
+#          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+#          dockerfile: Dockerfile
+#          path: .
+#          region: AWS_REGION
+#          repo: nodejs-app
+#          tag: "$CIRCLE_BUILD_NUM"
+
+
+
+
+
+
   
 #  deploy-app:
 #    docker:
@@ -135,24 +187,4 @@ jobs:
 #            aws eks --region us-east-1 update-kubeconfig --name eksctl-demo
 #            kubectl apply -f ./deploy.yml
 #            kubectl get node
-#            kubectl get pods -o wide            
-
-
-workflows:
-  build_and_push_image:
-    jobs:
-      - build_image_and_deploy_staging:
-          filters:
-            branches:
-              only: main
-
-
-#      - aws-ecr/build-and-push-image:
-#          account-url: AWS_ECR_ACCOUNT_URL
-#          aws-access-key-id: AWS_ACCESS_KEY_ID
-#          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
-#          dockerfile: Dockerfile
-#          path: .
-#          region: AWS_REGION
-#          repo: nodejs-app
-#          tag: "$CIRCLE_BUILD_NUM"
+#            kubectl get pods -o wide       
