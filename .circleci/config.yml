@@ -14,10 +14,11 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk --upgrade add --no-cache curl awscli\
+            apk --upgrade add --no-cache curl \
               py-pip=9.0.0-r1
             pip install \
               docker-compose==1.12.0 \
+              --upgrade add awscli
       - restore_cache:
           keys:
             - v1-{{ .Branch }}
