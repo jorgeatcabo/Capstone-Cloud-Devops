@@ -152,7 +152,7 @@ jobs:
       - run:
           name: Ensure EKS exists
           command: |
-            eksctl create cluster --name nodejs-app-cluster --region=us-west-1      
+            eksctl create cluster --name nodejs-app --region=us-west-1      
       - destroy-environment         
 
 
