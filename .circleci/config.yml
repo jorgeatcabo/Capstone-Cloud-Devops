@@ -30,6 +30,7 @@ jobs:
             pip install \
               docker-compose==1.12.0 \
               --upgrade awscli \
+              --upgrade gettext
       - restore_cache:
           keys:
             - v1-{{ .Branch }}
