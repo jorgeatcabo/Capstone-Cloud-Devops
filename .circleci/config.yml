@@ -163,10 +163,10 @@ workflows:
           filters:
             branches:
               only: main     
-      - build:
-          filters:
-            branches:
-              only: main 
+#      - build:
+#          filters:
+#            branches:
+#              only: main 
               
 #      - build_image_and_deploy_staging:
 #          filters:
