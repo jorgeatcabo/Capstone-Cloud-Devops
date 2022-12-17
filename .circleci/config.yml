@@ -1,4 +1,15 @@
 version: 2.1
+
+commands:
+  destroy-environment:
+    description: Destroy EKS.    
+    steps:
+      - run:
+          name: Destroy environments
+          # when: on_fail
+          command: |
+            eksctl delete cluster --name eksctl-demo --region=us-west-1
+
 orbs:
   # https://circleci.com/developer/orbs/orb/circleci/aws-ecr
   aws-ecr: circleci/aws-ecr@6.15.0
@@ -127,16 +138,35 @@ jobs:
           command: |
             kubectl apply -f .k8s/.generated/ --validate=true
             kubectl get pod            
-     
+
+  deploy-infrastructure:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - run:
+          name: Install eksctl
+          command: |
+            curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+            sudo mv /tmp/eksctl /usr/local/bin
+      - run:
+          name: Ensure EKS exists
+          command: |
+            eksctl create cluster --name eksctl-demo --region=us-west-1      
+      - destroy-environment         
 
 
 workflows:
   build_and_push_image:
     jobs:
-       - build:
+       - deploy-infrastructure:
           filters:
             branches:
-              only: main 
+              only: main     
+#      - build:
+#          filters:
+#            branches:
+#              only: main 
               
 #      - build_image_and_deploy_staging:
 #          filters:
