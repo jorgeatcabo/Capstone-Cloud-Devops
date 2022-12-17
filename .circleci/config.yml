@@ -159,14 +159,14 @@ jobs:
 workflows:
   build_and_push_image:
     jobs:
-      - deploy-infrastructure:
-          filters:
-            branches:
-              only: main     
-#      - build:
+#      - deploy-infrastructure:
 #          filters:
 #            branches:
-#              only: main 
+#              only: main     
+      - build:
+          filters:
+            branches:
+              only: main 
               
 #      - build_image_and_deploy_staging:
 #          filters:
