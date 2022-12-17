@@ -76,7 +76,7 @@ jobs:
       - run:
           name: Prepare K8S templates
           command: |
-            aws eks --region $AWS_REGION update-kubeconfig --name nodejs-app-cluster
+            aws eks --region $AWS_REGION update-kubeconfig --name nodejs-app
             rm -rf .k8s/.generated && mkdir -p .k8s/.generated
             for f in .k8s/templates/staging.yml
               do
