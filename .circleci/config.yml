@@ -6,9 +6,9 @@ commands:
     steps:
       - run:
           name: Destroy environments
-          # when: on_fail
+          when: on_fail
           command: |
-            eksctl delete cluster --name eksctl-demo --region=us-west-1
+            eksctl delete cluster --name nodejs-app --region=us-west-1
 
 orbs:
   # https://circleci.com/developer/orbs/orb/circleci/aws-ecr
@@ -159,14 +159,14 @@ jobs:
 workflows:
   build_and_push_image:
     jobs:
-       - deploy-infrastructure:
+      - deploy-infrastructure:
           filters:
             branches:
               only: main     
-#      - build:
-#          filters:
-#            branches:
-#              only: main 
+      - build:
+          filters:
+            branches:
+              only: main 
               
 #      - build_image_and_deploy_staging:
 #          filters:
