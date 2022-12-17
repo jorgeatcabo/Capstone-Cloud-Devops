@@ -66,13 +66,13 @@ jobs:
               docker tag app "${AWS_ECR_ACCOUNT_URL}/nodejs-app:${CIRCLE_BUILD_NUM}"
               docker push "${AWS_ECR_ACCOUNT_URL}/nodejs-app:${CIRCLE_BUILD_NUM}"
             fi
-      - run:
-          name: Install kubectl
-          command: |
-            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-            chmod +x kubectl
-            mkdir -p ~/.local/bin
-            mv ./kubectl ~/.local/bin/kubectl
+#      - run:
+#          name: Install kubectl
+#          command: |
+#            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+#            chmod +x kubectl
+#            mkdir -p ~/.local/bin
+#            mv ./kubectl ~/.local/bin/kubectl
       - run:
           name: Prepare K8S templates
           command: |
@@ -85,6 +85,10 @@ jobs:
       - run:
           name: Deploy
           command: |
+            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+            chmod +x kubectl
+            mkdir -p ~/.local/bin
+            mv ./kubectl ~/.local/bin/kubectl
             kubectl apply -f .k8s/.generated/ --validate=true
             kubectl get pod                
 
