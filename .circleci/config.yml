@@ -85,8 +85,9 @@ jobs:
       - run:
           name: Deploy
           command: |
-            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+            curl -LO https://dl.k8s.io/release/v1.24.0/bin/linux/amd64/kubectl
             install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+            kubectl version --client
             kubectl apply -f .k8s/.generated/ --validate=true
             kubectl get pod                
 
@@ -161,14 +162,14 @@ jobs:
 workflows:
   build_and_push_image:
     jobs:
-#      - deploy-infrastructure:
-#          filters:
-#            branches:
-#              only: main     
-      - build:
+      - deploy-infrastructure:
           filters:
             branches:
-              only: main 
+              only: main     
+#      - build:
+#          filters:
+#            branches:
+#              only: main 
               
 #      - build_image_and_deploy_staging:
 #          filters:
@@ -233,3 +234,4 @@ workflows:
 
 #docker:17.05.0-ce-git
 #              awscli==1.15.32
+# curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
