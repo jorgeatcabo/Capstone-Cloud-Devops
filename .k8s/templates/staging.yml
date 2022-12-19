@@ -9,7 +9,7 @@ data:
   ENV_VALUE2: value2
 
 ---
-apiVersion: apps/v1beta1
+apiVersion: v1
 kind: Deployment
 metadata:
   name: app-staging-deployment
@@ -49,3 +49,4 @@ spec:
       targetPort: 8080
       
 #${AWS_ECR_ACCOUNT_URL}/nodejs-app:${CIRCLE_BUILD_NUM}      
+#apiVersion: apps/v1beta1
