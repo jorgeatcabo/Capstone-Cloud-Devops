@@ -8,7 +8,7 @@ commands:
           name: Destroy environments
           when: on_fail
           command: |
-            eksctl delete cluster --name nodejs-app --region=us-west-1
+            eksctl delete cluster --name $CLUSTER_NAME --region=us-west-1
 
 orbs:
   # https://circleci.com/developer/orbs/orb/circleci/aws-ecr
@@ -58,7 +58,7 @@ jobs:
       #    command: |
       #      docker-compose -f ./docker-compose.test.yml up
       - deploy:
-          name: Push application Docker image
+          name: Push application Docker image to AWS ECR
           command: |
             if [ "${CIRCLE_BRANCH}" == "main" ]; then
               login="$(aws ecr get-login --region ${AWS_REGION})"
@@ -66,6 +66,7 @@ jobs:
               docker tag app "${AWS_ECR_ACCOUNT_URL}/nodejs-app:${CIRCLE_BUILD_NUM}"
               docker push "${AWS_ECR_ACCOUNT_URL}/nodejs-app:${CIRCLE_BUILD_NUM}"
             fi
+            
 #      - run:
 #          name: Install kubectl
 #          command: |
@@ -73,74 +74,23 @@ jobs:
 #            chmod +x kubectl
 #            mkdir -p ~/.local/bin
 #            mv ./kubectl ~/.local/bin/kubectl
-      - run:
-          name: Prepare K8S templates
-          command: |
-            aws eks --region $AWS_REGION update-kubeconfig --name nodejs-app
-            rm -rf .k8s/.generated && mkdir -p .k8s/.generated
-            for f in .k8s/templates/staging.yml
-              do
-              envsubst < $f > ".k8s/.generated/$(basename $f)"
-            done
+
+#      - run:
+#          name: Prepare K8S templates
+#          command: |
+#            aws eks --region $AWS_REGION update-kubeconfig --name $CLUSTER_NAME
+#            rm -rf .k8s/.generated && mkdir -p .k8s/.generated
+#            for f in .k8s/templates/staging.yml
+#              do
+#              envsubst < $f > ".k8s/.generated/$(basename $f)"
+#            done
       - run:
           name: Deploy
           command: |
-            curl -LO https://dl.k8s.io/release/v1.24.0/bin/linux/amd64/kubectl
+            curl -LO https://dl.k8s.io/release/v1.25.0/bin/linux/amd64/kubectl
             install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
             kubectl version --client
-            kubectl apply -f .k8s/.generated/ --validate=true
-            kubectl get pod                
-
-  build_image_and_deploy_staging:
-    docker:
-      - image: circleci/python:3.7
-
-    working_directory: ~/app
-
-    steps:
-      - attach_workspace:
-          at: ~/app
-
-      - run:
-          name: Install awscli and gettext-base
-          command: |
-            sudo pip3 install awscli
-      - run:
-          name: Install aws-iam-authenticator
-          command: |
-            curl -o aws-iam-authenticator curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator
-            chmod +x ./aws-iam-authenticator
-            sudo mv ./aws-iam-authenticator /usr/local/bin/aws-iam-authenticator
-      - run:
-          name: Install kubectl
-          command: |
-            curl -o kubectl https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/kubectl
-            chmod +x ./kubectl
-            sudo mv ./kubectl /usr/local/bin/kubectl
-
-      - setup_remote_docker
-
-      - run:
-          name: Login to repository and build docker image
-          command: |
-            login="$(aws ecr get-login --region ${AWS_REGION})"
-            ${login}            
-            docker build -t ${AWS_ECR_ACCOUNT_URL}/nodejs-app:${CIRCLE_BUILD_NUM} .
-            docker push ${AWS_ECR_ACCOUNT_URL}/nodejs-app:${CIRCLE_BUILD_NUM}
-      - run:
-          name: Prepare K8S templates
-          command: |
-            aws eks --region $AWS_DEFAULT_REGION update-kubeconfig --name $CLUSTER_NAME
-            rm -rf .k8s/.generated && mkdir -p .k8s/.generated
-            for f in .k8s/templates/staging.yml
-              do
-              envsubst < $f > ".k8s/.generated/$(basename $f)"
-            done
-      - run:
-          name: Deploy
-          command: |
-            kubectl apply -f .k8s/.generated/ --validate=true
-            kubectl get pod            
+            kubectl apply -f .k8s/templates/deployment.yml
 
   deploy-infrastructure:
     docker:
@@ -155,21 +105,21 @@ jobs:
       - run:
           name: Ensure EKS exists
           command: |
-            eksctl create cluster --name nodejs-app --region=us-west-1      
+            eksctl create cluster --name $CLUSTER_NAME --region=us-west-1      
       - destroy-environment         
 
 
 workflows:
   build_and_push_image:
     jobs:
-#      - deploy-infrastructure:
-#          filters:
-#            branches:
-#              only: main     
-      - build:
+      - deploy-infrastructure:
           filters:
             branches:
-              only: main 
+              only: main     
+#      - build:
+#          filters:
+#            branches:
+#              only: main 
               
 #      - build_image_and_deploy_staging:
 #          filters:
