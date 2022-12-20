@@ -106,7 +106,7 @@ jobs:
           name: Ensure EKS exists
           command: |
             eksctl create cluster --name $CLUSTER_NAME --region=us-west-1      
-      - destroy-environment         
+      #- destroy-environment         
 
 
 workflows:
