@@ -1,15 +1,4 @@
 version: 2.1
-
-commands:
-  destroy-environment:
-    description: Destroy EKS.    
-    steps:
-      - run:
-          name: Destroy environments
-          when: on_fail
-          command: |
-            eksctl delete cluster --name $CLUSTER_NAME --region=us-west-1
-
 orbs:
   aws-ecr: circleci/aws-ecr@6.15.0
 

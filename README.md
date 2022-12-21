@@ -3,7 +3,7 @@
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorgeatcabo/Capstone-Cloud-Devops/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/jorgeatcabo/Capstone-Cloud-Devops/tree/main)
 
 ## Project Overview
-This project develop a CI/CD pipeline for a micro service application with rolling deployment. Also this project develops your Continuous Integration steps, but also include typographical checking (aka “linting”).
+This project develops a CI/CD pipeline for a micro service application with rolling deployment. Also this project develops your Continuous Integration steps, but also include typographical checking (aka “linting”).
 
 This project includes:
 
