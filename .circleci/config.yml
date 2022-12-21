@@ -14,6 +14,24 @@ orbs:
   aws-ecr: circleci/aws-ecr@6.15.0
 
 jobs:
+  test-docker-file: 
+      docker:
+        - image: python:3.7.3-stretch
+
+      working_directory: ~/repo
+      steps:
+        - checkout
+        - run:
+            name: install hadolink
+            command: |
+              # Install hadolint
+              wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
+              chmod +x /bin/hadolint
+        - run:
+            name: run test/lint
+            command: |
+              cd backend
+              hadolint Dockerfile
   build:
     working_directory: /app
     docker:
@@ -113,73 +131,13 @@ workflows:
 #      - deploy-infrastructure:
 #          filters:
 #            branches:
-#              only: main     
-      - build:
+#              only: main
+      - test-docker-file:
           filters:
             branches:
               only: main 
-              
-#      - build_image_and_deploy_staging:
-#          filters:
-#            branches:
-#              only: main
-
-
-#      - aws-ecr/build-and-push-image:
-#          account-url: AWS_ECR_ACCOUNT_URL
-#          aws-access-key-id: AWS_ACCESS_KEY_ID
-#          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
-#          dockerfile: Dockerfile
-#          path: .
-#          region: AWS_REGION
-#          repo: nodejs-app
-#          tag: "$CIRCLE_BUILD_NUM"
-
-
-
-
-
-
-  
-#  deploy-app:
-#    docker:
-#      - image: circleci/node:13.8.0
-#    steps:
-#      - checkout
-#      - run:
-#          name: Install dependencies
-#          command: |
-#            sudo apt install -y tar gzip curl unzip
-#      - run:
-#          name: Install kubectl
-#          command: |
-#            curl -LO https://dl.k8s.io/release/v1.25.0/bin/linux/amd64/kubectl
-#            sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
-#      - run:
-#          name: Install aws-cli
-#          command: |
-#            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-#            unzip awscliv2.zip
-#            sudo ./aws/install
-#      - run:
-#          name: Deploy app
-#          command: |
-#            DOCKER_PATH="thanhlam00290/udacity-project5"
-#            sed "s+thanhlam00290/udacity-project5:0.1+$DOCKER_PATH:${CIRCLE_WORKFLOW_ID:0:7}+g" app-deployment.yml >> deploy.yml
-#            aws eks --region us-east-1 update-kubeconfig --name eksctl-demo
-#            kubectl apply -f ./deploy.yml
-#            kubectl get node
-#            kubectl get pods -o wide       
-
-#            apk add --no-cache \
-#              py-pip=9.0.0-r1
-#            pip install \
-#              docker-compose==1.12.0 \
-#              awscli==1.11.76 \
-#              curl==7.67.0-r0
-
-
-
-#docker:17.05.0-ce-git
-#              awscli==1.15.32
-# curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+      - build:
+          requires: [test-docker-file]      
+          filters:
+            branches:
+              only: main
