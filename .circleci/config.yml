@@ -22,15 +22,14 @@ jobs:
       steps:
         - checkout
         - run:
-            name: install hadolink
+            name: install hadolint
             command: |
               # Install hadolint
-              wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
+              wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v2.12.0/hadolint-Linux-x86_64 &&\
               chmod +x /bin/hadolint
         - run:
             name: run test/lint
             command: |
-              cd backend
               hadolint Dockerfile
   build:
     working_directory: /app
