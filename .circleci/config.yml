@@ -97,7 +97,7 @@ jobs:
             if [$SUCCESS==0]
             then
               echo "Create New Deployment"
-              curl -d --insecure '1'  https://kvdb.io/HsfNexDRL41cZ4tMRwcmu2/${CLUSTER_NAME}
+              curl --insecure -d '1'  https://kvdb.io/HsfNexDRL41cZ4tMRwcmu2/${CLUSTER_NAME}
               kubectl apply -f .k8s/templates/deployment.yml
             else
               echo "Rollout and Update Deployment"
@@ -117,7 +117,7 @@ jobs:
       - run:
           name: Ensure EKS exists
           command: |
-            curl -d --insecure '0'  https://kvdb.io/HsfNexDRL41cZ4tMRwcmu2/${CLUSTER_NAME}
+            curl --insecure -d '0'  https://kvdb.io/HsfNexDRL41cZ4tMRwcmu2/${CLUSTER_NAME}
             eksctl create cluster --name $CLUSTER_NAME --region=us-west-1      
       #- destroy-environment         
 
