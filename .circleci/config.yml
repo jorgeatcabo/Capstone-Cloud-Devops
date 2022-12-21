@@ -63,8 +63,8 @@ jobs:
             if [ "${CIRCLE_BRANCH}" == "main" ]; then
               login="$(aws ecr get-login --region ${AWS_REGION})"
               ${login}
-              docker tag app "${AWS_ECR_ACCOUNT_URL}/nodejs-app:${CIRCLE_BUILD_NUM}"
-              docker push "${AWS_ECR_ACCOUNT_URL}/nodejs-app:${CIRCLE_BUILD_NUM}"
+              docker tag app "${AWS_ECR_ACCOUNT_URL}/nodejs-app:latest"
+              docker push "${AWS_ECR_ACCOUNT_URL}/nodejs-app:latest"
             fi
             
 #      - run:
@@ -75,15 +75,6 @@ jobs:
 #            mkdir -p ~/.local/bin
 #            mv ./kubectl ~/.local/bin/kubectl
 
-#      - run:
-#          name: Prepare K8S templates
-#          command: |
-#            aws eks --region $AWS_REGION update-kubeconfig --name $CLUSTER_NAME
-#            rm -rf .k8s/.generated && mkdir -p .k8s/.generated
-#            for f in .k8s/templates/staging.yml
-#              do
-#              envsubst < $f > ".k8s/.generated/$(basename $f)"
-#            done
       - run:
           name: Deploy
           command: |
@@ -97,8 +88,8 @@ jobs:
             if [$SUCCESS==0]
             then
               echo "Create New Deployment"
-              curl --insecure -d '1'  https://kvdb.io/HsfNexDRL41cZ4tMRwcmu2/${CLUSTER_NAME}
               kubectl apply -f .k8s/templates/deployment.yml
+              curl --insecure -d '1'  https://kvdb.io/HsfNexDRL41cZ4tMRwcmu2/${CLUSTER_NAME}
             else
               echo "Rollout and Update Deployment"
               kubectl rollout restart deployment/app-staging-deployment
@@ -125,14 +116,14 @@ jobs:
 workflows:
   build_and_push_image:
     jobs:
-      - deploy-infrastructure:
-          filters:
-            branches:
-              only: main     
-#      - build:
+#      - deploy-infrastructure:
 #          filters:
 #            branches:
-#              only: main 
+#              only: main     
+      - build:
+          filters:
+            branches:
+              only: main 
               
 #      - build_image_and_deploy_staging:
 #          filters:
