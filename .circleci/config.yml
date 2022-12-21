@@ -77,12 +77,12 @@ jobs:
             #if [$SUCCESS==0]
             if (( $SUCCESS == 0 ));
             then
-              echo "SUCCESS: ${SUCCESS}"
+              echo "SUCCESS from then: ${SUCCESS}"
               echo "Create New Deployment"
               kubectl apply -f .k8s/templates/deployment.yml
               curl --insecure -d '1'  https://kvdb.io/HsfNexDRL41cZ4tMRwcmu2/${CLUSTER_NAME}
             else
-              echo "SUCCESS: ${SUCCESS}"
+              echo "SUCCESS from else: ${SUCCESS}"
               kubectl get pods
               echo "Rollout and Update Deployment"
               kubectl rollout restart deployment/app-staging-deployment
