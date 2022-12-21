@@ -75,7 +75,7 @@ jobs:
             SUCCESS=$(curl --insecure https://kvdb.io/HsfNexDRL41cZ4tMRwcmu2/${CLUSTER_NAME})
             echo "SUCCESS: ${SUCCESS}"
             #if [$SUCCESS==0]
-            if (( $SUCCESS == 0 ));
+            if (( $SUCCESS == "0" ));
             then
               echo "SUCCESS from then: ${SUCCESS}"
               echo "Create New Deployment"
