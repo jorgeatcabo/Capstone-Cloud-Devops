@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: app-staging
-          image: 182620489580.dkr.ecr.us-west-1.amazonaws.com/nodejs-app:29
+          image: 182620489580.dkr.ecr.us-west-1.amazonaws.com/nodejs-app:81
           imagePullPolicy: Always
           ports:
             - containerPort: 8080

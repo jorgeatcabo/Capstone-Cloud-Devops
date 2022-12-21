@@ -93,7 +93,6 @@ jobs:
             kubectl version --client
             kubectl get pods
             SUCCESS=$(curl --insecure  https://kvdb.io/WXYfE8x6ATuBiPjy2P2upo/${CLUSTER_NAME})
-            echo $SUCCESS
             if [$SUCCESS==0]
             then
               echo "Create New Deployment"
