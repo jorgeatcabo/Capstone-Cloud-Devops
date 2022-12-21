@@ -81,16 +81,16 @@ jobs:
             aws eks --region $AWS_REGION update-kubeconfig --name $CLUSTER_NAME
             curl -LO https://dl.k8s.io/release/v1.23.6/bin/linux/amd64/kubectl
             install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
-            kubectl version --client
-            kubectl get pods
             SUCCESS=$(curl --insecure https://kvdb.io/HsfNexDRL41cZ4tMRwcmu2/${CLUSTER_NAME})
             echo $SUCCESS
-            if [$SUCCESS==0]
+            #if [$SUCCESS==0]
+            if (( $SUCCESS == 0 ));
             then
               echo "Create New Deployment"
               kubectl apply -f .k8s/templates/deployment.yml
               curl --insecure -d '1'  https://kvdb.io/HsfNexDRL41cZ4tMRwcmu2/${CLUSTER_NAME}
             else
+              kubectl get pods
               echo "Rollout and Update Deployment"
               kubectl rollout restart deployment/app-staging-deployment
             fi
