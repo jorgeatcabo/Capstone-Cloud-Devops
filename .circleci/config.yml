@@ -66,15 +66,6 @@ jobs:
               docker tag app "${AWS_ECR_ACCOUNT_URL}/nodejs-app:latest"
               docker push "${AWS_ECR_ACCOUNT_URL}/nodejs-app:latest"
             fi
-            
-#      - run:
-#          name: Install kubectl
-#          command: |
-#            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-#            chmod +x kubectl
-#            mkdir -p ~/.local/bin
-#            mv ./kubectl ~/.local/bin/kubectl
-
       - run:
           name: Deploy
           command: |
@@ -86,10 +77,12 @@ jobs:
             #if [$SUCCESS==0]
             if (( $SUCCESS == 0 ));
             then
+              echo "SUCCESS: ${SUCCESS}"
               echo "Create New Deployment"
               kubectl apply -f .k8s/templates/deployment.yml
               curl --insecure -d '1'  https://kvdb.io/HsfNexDRL41cZ4tMRwcmu2/${CLUSTER_NAME}
             else
+              echo "SUCCESS: ${SUCCESS}"
               kubectl get pods
               echo "Rollout and Update Deployment"
               kubectl rollout restart deployment/app-staging-deployment
@@ -111,7 +104,6 @@ jobs:
             curl --insecure -d '0'  https://kvdb.io/HsfNexDRL41cZ4tMRwcmu2/${CLUSTER_NAME}
             eksctl create cluster --name $CLUSTER_NAME --region=us-west-1      
       #- destroy-environment         
-
 
 workflows:
   build_and_push_image:
