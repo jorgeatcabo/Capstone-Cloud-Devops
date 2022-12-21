@@ -92,17 +92,17 @@ jobs:
             install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
             kubectl version --client
             kubectl get pods
-            SUCCESS=$(curl --insecure  https://kvdb.io/WXYfE8x6ATuBiPjy2P2upo/${CLUSTER_NAME})
+            SUCCESS=$(curl --insecure https://kvdb.io/HsfNexDRL41cZ4tMRwcmu2/${CLUSTER_NAME})
+            echo $SUCCESS
             if [$SUCCESS==0]
             then
               echo "Create New Deployment"
-              kubectl apply -f .k8s/templates/deployment.ymlml
+              curl -d '1'  https://kvdb.io/HsfNexDRL41cZ4tMRwcmu2/${CLUSTER_NAME}
+              kubectl apply -f .k8s/templates/deployment.yml
             else
               echo "Rollout and Update Deployment"
               kubectl rollout restart deployment/app-staging-deployment
             fi
-            
-            
 
   deploy-infrastructure:
     docker:
@@ -117,6 +117,7 @@ jobs:
       - run:
           name: Ensure EKS exists
           command: |
+            curl -d '0'  https://kvdb.io/HsfNexDRL41cZ4tMRwcmu2/${CLUSTER_NAME}
             eksctl create cluster --name $CLUSTER_NAME --region=us-west-1      
       #- destroy-environment         
 
@@ -124,14 +125,14 @@ jobs:
 workflows:
   build_and_push_image:
     jobs:
-#      - deploy-infrastructure:
-#          filters:
-#            branches:
-#              only: main     
-      - build:
+      - deploy-infrastructure:
           filters:
             branches:
-              only: main 
+              only: main     
+#      - build:
+#          filters:
+#            branches:
+#              only: main 
               
 #      - build_image_and_deploy_staging:
 #          filters:
