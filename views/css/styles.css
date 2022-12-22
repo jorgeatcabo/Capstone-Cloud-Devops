@@ -19,7 +19,7 @@ p {
 }
 
 .jumbotron {
-	background: #7CFC00;
+	background: #0048CD;
 	color: white;
 	text-align: center;
 }
@@ -48,4 +48,8 @@ div.caption: {
 	clear: both;
 }
 
+#Blue background
 #background: #0048CD;
+
+#Green background
+#background: #7CFC00;
