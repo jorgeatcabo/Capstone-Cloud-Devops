@@ -109,16 +109,16 @@ jobs:
 workflows:
   build_and_push_image:
     jobs:
-      - deploy-infrastructure:
-          filters:
-            branches:
-              only: main
-#      - test-docker-file:
-#          filters:
-#            branches:
-#              only: main 
-#      - build:
-#          requires: [test-docker-file]      
+#      - deploy-infrastructure:
 #          filters:
 #            branches:
 #              only: main
+      - test-docker-file:
+          filters:
+            branches:
+              only: main 
+      - build:
+          requires: [test-docker-file]      
+          filters:
+            branches:
+              only: main
